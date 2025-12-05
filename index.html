@@ -56,6 +56,8 @@ nav{
   z-index:1000;
   box-shadow:var(--shadow);
 }
+
+/* горизонтальное меню (десктоп) */
 .nav-center{
   display:flex;
   gap:20px;
@@ -69,6 +71,13 @@ nav a{
 }
 nav a:hover{color:var(--accent);}
 
+/* активный пункт меню */
+nav a.active,
+.mobile-menu-panel a.active{
+  color:#ffe082;
+  text-decoration:underline;
+}
+
 /* логотип справа */
 .nav-logo{
   width:40px;
@@ -80,9 +89,93 @@ nav a:hover{color:var(--accent);}
   transition:transform .25s;
 }
 .nav-logo:hover{transform:scale(1.08);}
+
+/* ---------- БУРГЕР-КНОПКА (МОБАЙЛ) ---------- */
+.burger{
+  display:none;
+  width:34px;
+  height:28px;
+  padding:0;
+  margin-right:8px;
+  background:none;
+  border:none;
+  cursor:pointer;
+  position:relative;
+}
+.burger span{
+  position:absolute;
+  left:0;
+  right:0;
+  height:3px;
+  border-radius:999px;
+  background:#fff;
+  transition:.25s;
+}
+.burger span:nth-child(1){top:4px;}
+.burger span:nth-child(2){top:12px;}
+.burger span:nth-child(3){top:20px;}
+.burger.active span:nth-child(1){
+  transform:translateY(8px) rotate(45deg);
+}
+.burger.active span:nth-child(2){
+  opacity:0;
+}
+.burger.active span:nth-child(3){
+  transform:translateY(-8px) rotate(-45deg);
+}
+
+/* выезжающее меню (сайдбар) */
+.mobile-menu-panel{
+  position:fixed;
+  top:0;
+  right:0;
+  bottom:0;
+  width:260px;
+  background:var(--primary);
+  display:flex;
+  flex-direction:column;
+  padding:70px 18px 18px;
+  gap:14px;
+  transform:translateX(100%);
+  transition:transform .25s ease-out;
+  z-index:1500;
+}
+.mobile-menu-panel a{
+  color:#fff;
+  text-decoration:none;
+  font-weight:600;
+  font-size:16px;
+}
+.mobile-menu-panel a:hover{
+  color:var(--accent);
+}
+.mobile-menu-panel.open{
+  transform:translateX(0);
+}
+
+/* затемнение фона за меню */
+.menu-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.45);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s;
+  z-index:1400;
+}
+.menu-backdrop.visible{
+  opacity:1;
+  pointer-events:auto;
+}
+
+/* десктоп / мобилка */
+@media (max-width:768px){
+  .burger{display:block;}
+  .desktop-nav{display:none;}
+  .nav-logo{width:34px;height:34px;}
+}
 @media (max-width:600px){
   .nav-center{gap:10px;font-size:14px;}
-  .nav-logo{width:34px;height:34px;}
 }
 
 /* ---------- КОНТЕЙНЕР ---------- */
@@ -184,7 +277,6 @@ nav a:hover{color:var(--accent);}
 }
 .gallery-grid img:hover{transform:scale(1.03);}
 
-/* блоки внутри галереи */
 .vroschy-grid,
 .ortho-grid{
   display:grid;
@@ -267,14 +359,14 @@ nav a:hover{color:var(--accent);}
   padding:18px;
   border-radius:var(--radius);
   box-shadow:var(--shadow);
-  text-align:center; /* ВСЁ ПО ЦЕНТРУ */
+  text-align:center;
 }
 .contacts p{
   margin:4px 0;
   font-size:15px;
 }
 
-/* кнопки мессенджеров */
+/* соц-кнопки */
 .social-buttons{
   display:flex;
   justify-content:center;
@@ -301,7 +393,7 @@ nav a:hover{color:var(--accent);}
 .tg-btn{background:#2AABEE;}
 .wa-btn{background:#25D366;}
 
-/* ---------- ЛАЙТБОКС ДЛЯ ФОТО ---------- */
+/* ---------- ЛАЙТБОКС ---------- */
 .lightbox{
   display:none;
   position:fixed;
@@ -362,7 +454,7 @@ footer{
   font-size:14px;
 }
 
-/* ---------- КНОПКА ЗВОНКА (ТОЛЬКО МОБИЛЬНАЯ) ---------- */
+/* ---------- КНОПКА ЗВОНКА (МОБИЛЬНАЯ) ---------- */
 .call-button{
   position:fixed;
   right:18px;
@@ -390,7 +482,13 @@ footer{
 <body>
 
 <nav>
-  <div class="nav-center">
+  <!-- Бургер для мобильного меню -->
+  <button class="burger" id="burger" aria-label="Открыть меню">
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- Горизонтальное меню (десктоп) -->
+  <div class="nav-center desktop-nav">
     <a href="#intro">Обо мне</a>
     <a href="#skills">Навыки</a>
     <a href="#diplomas">Дипломы</a>
@@ -399,8 +497,23 @@ footer{
     <a href="#contacts">Контакты</a>
     <a href="#profiles">Профили</a>
   </div>
+
   <img class="nav-logo" src="GigaChat (7).jpg" alt="Логотип">
 </nav>
+
+<!-- Боковое мобильное меню -->
+<div class="mobile-menu-panel" id="mobile-menu">
+  <a href="#intro">Обо мне</a>
+  <a href="#skills">Навыки</a>
+  <a href="#diplomas">Дипломы</a>
+  <a href="#gallery">Галерея</a>
+  <a href="#price">Прайс-лист</a>
+  <a href="#contacts">Контакты</a>
+  <a href="#profiles">Профили</a>
+</div>
+
+<!-- Затемнение фона -->
+<div class="menu-backdrop" id="menu-backdrop"></div>
 
 <main class="container">
 
@@ -514,7 +627,7 @@ footer{
     <tr><td>Удаление ногтевой пластины при ониходистрофии</td><td>30 мин</td><td>от 1 500 ₽</td></tr>
     <tr><td>Взятие анализа из очага инфекции (без проведения анализа)</td><td>15 мин</td><td>800 ₽</td></tr>
     <tr><td>Взятие анализа + проведение в лаборатории</td><td>15 мин</td><td>1 900 ₽</td></tr>
-    <tr><td>Анализ + лаборатория + консультация</td><td>1 ч</td><td>3 000 ₽</td></tr>
+    <tr><td>Анализ, лаборатория и консультация</td><td>1 ч</td><td>3 000 ₽</td></tr>
     <tr><td>Анестезия внутритканевая (Лидокаин)</td><td>15 мин</td><td>900 ₽</td></tr>
     <tr><td>Анестезия наружная (крем Эмла)</td><td>15 мин</td><td>500 ₽</td></tr>
     <tr><td>Анестезия наружная (спрей Лидокаин)</td><td>15 мин</td><td>500 ₽</td></tr>
@@ -553,12 +666,8 @@ footer{
   <p><strong>Часы приёма:</strong> Пн–Сб, 10:00–20:00</p>
 
   <div class="social-buttons">
-    <a class="tg-btn" href="https://t.me/+79112675188" target="_blank">
-      Telegram
-    </a>
-    <a class="wa-btn" href="https://wa.me/79112675188" target="_blank">
-      WhatsApp
-    </a>
+    <a class="tg-btn" href="https://t.me/+79112675188" target="_blank">Telegram</a>
+    <a class="wa-btn" href="https://wa.me/79112675188" target="_blank">WhatsApp</a>
   </div>
 </section>
 
@@ -568,7 +677,7 @@ footer{
   <p>&copy; 2025 Подолог Ева Максимова — Санкт-Петербург</p>
 </footer>
 
-<!-- Лайтбокс -->
+<!-- ЛАЙТБОКС -->
 <div id="lightbox" class="lightbox" aria-hidden="true">
   <div class="lightbox-inner">
     <button class="lb-close" id="lb-close" aria-label="Закрыть">&times;</button>
@@ -584,7 +693,7 @@ footer{
 </a>
 
 <script>
-// Лайтбокс для всех картинок внутри .container
+// Лайтбокс для фото
 (function(){
   const imgs = Array.from(document.querySelectorAll('.container img'));
   const box = document.getElementById('lightbox');
@@ -634,6 +743,101 @@ footer{
     if(e.key === 'ArrowLeft') showPrev();
     if(e.key === 'ArrowRight') showNext();
   });
+})();
+
+// Мобильное меню: бургер + сайдбар + затемнение
+(function(){
+  const burger = document.getElementById('burger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const backdrop = document.getElementById('menu-backdrop');
+
+  function closeMenu(){
+    burger.classList.remove('active');
+    mobileMenu.classList.remove('open');
+    backdrop.classList.remove('visible');
+    document.body.style.overflow = '';
+  }
+
+  burger.addEventListener('click', ()=>{
+    const isOpen = mobileMenu.classList.contains('open');
+    if(isOpen){
+      closeMenu();
+    } else{
+      burger.classList.add('active');
+      mobileMenu.classList.add('open');
+      backdrop.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+    }
+  });
+
+  backdrop.addEventListener('click', closeMenu);
+
+  // закрывать меню при клике по ссылке
+  mobileMenu.querySelectorAll('a').forEach(a=>{
+    a.addEventListener('click', closeMenu);
+  });
+
+  // на ресайз, если расширили окно до десктопа — очистить состояние
+  window.addEventListener('resize', ()=>{
+    if(window.innerWidth > 768){
+      closeMenu();
+    }
+  });
+})();
+
+// Плавная прокрутка с учётом высоты шапки + подсветка активного пункта
+(function(){
+  const header = document.querySelector('nav');
+  const sections = document.querySelectorAll('main section[id]');
+  const navLinks = document.querySelectorAll('nav .desktop-nav a, .mobile-menu-panel a');
+
+  function scrollToSection(id){
+    const target = document.getElementById(id);
+    if(!target) return;
+    const headerHeight = header.offsetHeight;
+    const y = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 10;
+    window.scrollTo({top:y, behavior:'smooth'});
+  }
+
+  // перехватываем клики по ссылкам меню
+  navLinks.forEach(link=>{
+    const href = link.getAttribute('href') || '';
+    if(href.startsWith('#')){
+      link.addEventListener('click', function(e){
+        const id = href.slice(1);
+        if(document.getElementById(id)){
+          e.preventDefault();
+          scrollToSection(id);
+        }
+      });
+    }
+  });
+
+  function updateActiveLink(){
+    const scrollPos = window.pageYOffset;
+    const headerHeight = header.offsetHeight + 20;
+    let currentId = '';
+
+    sections.forEach(sec=>{
+      if(scrollPos >= sec.offsetTop - headerHeight){
+        currentId = sec.id;
+      }
+    });
+
+    if(currentId){
+      navLinks.forEach(link=>{
+        const href = link.getAttribute('href');
+        if(href === '#'+currentId){
+          link.classList.add('active');
+        } else{
+          link.classList.remove('active');
+        }
+      });
+    }
+  }
+
+  window.addEventListener('scroll', updateActiveLink);
+  window.addEventListener('load', updateActiveLink);
 })();
 </script>
 
